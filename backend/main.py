@@ -1,6 +1,7 @@
 import requests
-import pandas
+import pandas as pd
 import time
+import datetime
 import os
 
 from dotenv import load_dotenv
@@ -55,7 +56,17 @@ def get_historical_prices(symbols):
             info = data.json()
 
             coin_prices = info["prices"]
-            prices[symbol].append(coin_prices)
+
+            formatted_prices = []
+
+            for price in coin_prices:
+                ms = price[0]
+                s = ms / 1000.0
+                date = datetime.datetime.fromtimestamp(s)
+                formatted_date = date.strftime("%m-%d-%Y")
+                formatted_prices.append([formatted_date, price[1]])
+
+            prices[symbol].append(formatted_prices)
 
         except Exception as e:
             print(f"Error finding prices : {e}")
@@ -64,6 +75,34 @@ def get_historical_prices(symbols):
     
     return prices
 
+def generate_df(symbols):
+    prices = get_historical_prices(symbols)
+
+    df_list = []
+
+    for ticker, data in prices.items():
+        # list of lists containing dates and prices (2D arr)
+        raw_data = data[0]
+
+        df = pd.DataFrame(raw_data, columns=['date', 'price'])
+
+        # converts dates to pd dates
+        df['date'] = pd.to_datetime(df['date'])
+
+        # groups all prices on singular day into and chooses last to represent, then puts into df
+        df = df.groupby(df['date'].dt.date)['price'].last().to_frame()
+
+        # renames price column to name of ticker
+        df.columns = [ticker]
+
+        df_list.append(df)
+
+    merged = pd.concat(df_list, axis=1)
+    merged = merged.dropna()
+
+    merged.to_csv("prices.csv", index=True)
+
+    return merged
 
 def main():
     symbols = []
@@ -74,14 +113,11 @@ def main():
 
     for i in range(num):
         symbol = input()
-        symbols.append(symbol)
+        symbols.append(symbol.upper())
     
-    res = get_historical_prices(symbols)
+    res = generate_df(symbols)
 
     print(res)
-
-    for key in res:
-        print(key)
 
 if __name__ == "__main__":
     main()
