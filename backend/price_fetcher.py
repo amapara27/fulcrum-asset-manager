@@ -7,19 +7,70 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from collections import defaultdict
+# COINS = {
+#     "BTC" : "bitcoin", 
+#     "ETH" : "ethereum", 
+#     "USDT" : "tether", 
+#     "BNB" : "binancecoin", 
+#     "USDC" : "usd-coin", 
+#     "XRP" : "ripple",
+#     "SOL": "solana",
+#     "TRON" : "tron",
+#     "DOGE" : "dogecoin",
+#     "ADA" : "cardano"
+# }
 
 COINS = {
-    "BTC" : "bitcoin", 
-    "ETH" : "ethereum", 
-    "USDT" : "tether", 
-    "BNB" : "binancecoin", 
-    "USDC" : "usd-coin", 
-    "XRP" : "ripple",
+    "BTC": "bitcoin",
+    "ETH": "ethereum",
+    "USDT": "tether",
+    "BNB": "binancecoin",
     "SOL": "solana",
-    "TRON" : "tron",
-    "DOGE" : "dogecoin",
-    "ADA" : "cardano"
+    "USDC": "usd-coin",
+    "XRP": "ripple",
+    "DOGE": "dogecoin",
+    "TON": "the-open-network",
+    "ADA": "cardano",
+    "SHIB": "shiba-inu",
+    "AVAX": "avalanche-2",
+    "TRX": "tron",
+    "DOT": "polkadot",
+    "BCH": "bitcoin-cash",
+    "LINK": "chainlink",
+    "NEAR": "near",
+    "MATIC": "matic-network",
+    "LTC": "litecoin",
+    "ICP": "internet-computer",
+    "LEO": "leo-token",
+    "DAI": "dai",
+    "UNI": "uniswap",
+    "APT": "aptos",
+    "ETC": "ethereum-classic",
+    "MANTLE": "mantle",
+    "RNDR": "render-token",
+    "HBAR": "hedera-hashgraph",
+    "FIL": "filecoin",
+    "ATOM": "cosmos",
+    "ARB": "arbitrum",
+    "IMX": "immutable-x",
+    "STX": "blockstack",
+    "CRO": "crypto-com-chain",
+    "VET": "vechain",
+    "MKR": "maker",
+    "INJ": "injective-protocol",
+    "OP": "optimism",
+    "GRT": "the-graph",
+    "KAS": "kaspa",
+    "XLM": "stellar",
+    "XMR": "monero",
+    "PEPE": "pepe",
+    "FDUSD": "first-digital-usd",
+    "SUI": "sui",
+    "OKB": "okb",
+    "LDO": "lido-dao",
+    "QNT": "quant-network",
+    "THETA": "theta-token",
+    "SEI": "sei-network",
 }
 
 COIN_GECKO_API_KEY = os.getenv("COIN_GECKO_API_KEY")
@@ -44,11 +95,10 @@ def get_curr_prices(symbols):
         
     return prices
 
-def get_historical_prices(symbols):
-    prices = defaultdict(list)
+def get_historical_prices():
+    prices = {}
 
-    for symbol in symbols:
-        id = COINS[symbol]
+    for symbol, id in COINS.items():
         url = f"https://api.coingecko.com/api/v3/coins/{id}/market_chart?vs_currency=usd&days=90&x_cg_demo_api_key={COIN_GECKO_API_KEY}"
 
         try:
@@ -66,23 +116,23 @@ def get_historical_prices(symbols):
                 formatted_date = date.strftime("%m-%d-%Y")
                 formatted_prices.append([formatted_date, price[1]])
 
-            prices[symbol].append(formatted_prices)
+            prices[symbol] = formatted_prices
 
         except Exception as e:
             print(f"Error finding prices : {e}")
 
-        time.sleep(1)
-    
+        time.sleep(2)
+
     return prices
 
-def generate_df(symbols):
-    prices = get_historical_prices(symbols)
+def generate_df():
+    prices = get_historical_prices()
 
     df_list = []
 
     for ticker, data in prices.items():
         # list of lists containing dates and prices (2D arr)
-        raw_data = data[0]
+        raw_data = data
 
         df = pd.DataFrame(raw_data, columns=['date', 'price'])
 
@@ -104,18 +154,23 @@ def generate_df(symbols):
 
     return merged
 
+def alter_df(df):
+
+
+    return df
+
 def main():
-    symbols = []
+    # symbols = []
 
-    num = int(input("Enter amount of coins held: "))
+    # num = int(input("Enter amount of coins held: "))
 
-    print(f"Enter your top {num} most held coins:")
+    # print(f"Enter your top {num} most held coins:")
 
-    for i in range(num):
-        symbol = input()
-        symbols.append(symbol.upper())
+    # for i in range(num):
+    #     symbol = input()
+    #     symbols.append(symbol.upper())
     
-    res = generate_df(symbols)
+    res = generate_df()
 
     print(res)
 
