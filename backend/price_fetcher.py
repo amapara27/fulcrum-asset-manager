@@ -25,7 +25,6 @@ COINS = {
     "BCH": "bitcoin-cash",
     "LINK": "chainlink",
     "NEAR": "near",
-    "MATIC": "matic-network",
     "LTC": "litecoin",
     "ICP": "internet-computer",
     "LEO": "leo-token",
@@ -140,6 +139,7 @@ def generate_df():
     merged_pct.to_csv("data/prices_original.csv", index=True)
 
     final_merged = merged_pct.T
+    final_merged.index.name = "Ticker"
 
     final_merged.to_csv("data/prices.csv", index=True)
 
