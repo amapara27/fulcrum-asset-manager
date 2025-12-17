@@ -145,17 +145,7 @@ def generate_df():
 
     return final_merged
 
-def main():
-    # symbols = []
-
-    # num = int(input("Enter amount of coins held: "))
-
-    # print(f"Enter your top {num} most held coins:")
-
-    # for i in range(num):
-    #     symbol = input()
-    #     symbols.append(symbol.upper())
-    
+def main():    
     res = generate_df()
 
     print(res)
