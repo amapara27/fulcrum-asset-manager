@@ -7,19 +7,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# COINS = {
-#     "BTC" : "bitcoin", 
-#     "ETH" : "ethereum", 
-#     "USDT" : "tether", 
-#     "BNB" : "binancecoin", 
-#     "USDC" : "usd-coin", 
-#     "XRP" : "ripple",
-#     "SOL": "solana",
-#     "TRON" : "tron",
-#     "DOGE" : "dogecoin",
-#     "ADA" : "cardano"
-# }
-
 COINS = {
     "BTC": "bitcoin",
     "ETH": "ethereum",
@@ -131,10 +118,7 @@ def generate_df():
     df_list = []
 
     for ticker, data in prices.items():
-        # list of lists containing dates and prices (2D arr)
-        raw_data = data
-
-        df = pd.DataFrame(raw_data, columns=['date', 'price'])
+        df = pd.DataFrame(data, columns=['date', 'price'])
 
         # converts dates to pd dates
         df['date'] = pd.to_datetime(df['date'])
@@ -150,9 +134,14 @@ def generate_df():
     merged = pd.concat(df_list, axis=1)
     merged = merged.dropna()
 
-    merged.to_csv("prices.csv", index=True)
+    # changes from prices to % return - normalizes
+    merged_pct = merged.pct_change().dropna()
 
-    return merged
+    final_merged = merged_pct.T
+
+    final_merged.to_csv("prices.csv", index=True)
+
+    return final_merged
 
 def alter_df(df):
 
