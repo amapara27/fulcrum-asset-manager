@@ -137,16 +137,13 @@ def generate_df():
     # changes from prices to % return - normalizes
     merged_pct = merged.pct_change().dropna()
 
+    merged_pct.to_csv("data/prices_original.csv", index=True)
+
     final_merged = merged_pct.T
 
-    final_merged.to_csv("prices.csv", index=True)
+    final_merged.to_csv("data/prices.csv", index=True)
 
     return final_merged
-
-def alter_df(df):
-
-
-    return df
 
 def main():
     # symbols = []
