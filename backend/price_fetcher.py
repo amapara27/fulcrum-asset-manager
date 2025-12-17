@@ -136,18 +136,15 @@ def generate_df():
     # changes from prices to % return - normalizes
     merged_pct = merged.pct_change().dropna()
 
-    merged_pct.to_csv("data/prices_original.csv", index=True)
-
     final_merged = merged_pct.T
     final_merged.index.name = "Ticker"
 
-    final_merged.to_csv("data/prices.csv", index=True)
+    final_merged.to_csv("data/market_prices.csv", index=True)
 
     return final_merged
 
 def main():    
     res = generate_df()
-
     print(res)
 
 if __name__ == "__main__":
