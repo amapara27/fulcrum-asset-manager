@@ -143,8 +143,9 @@ def generate_df():
 
     return final_merged
 
-def main():    
-    res = generate_df()
+def main():
+    symbols = ["BTC", "SOL", "ETH", "USDC", "PEPE"]    
+    res = get_curr_prices(symbols)
     print(res)
 
 if __name__ == "__main__":
