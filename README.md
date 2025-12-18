@@ -71,12 +71,13 @@ Fulcrum applies **Modern Portfolio Theory** to cryptocurrency investing using **
 - K-Means clustering (4 clusters: Safe Haven, Blue Chips, High Volatility, Altcoins)
 - Context-aware hedge recommendation system
 - Interactive CLI for querying coins
+- **Caching system**: Generates fresh data only every 24 hours to reduce API calls and improve performance
 
 ### Modules
 
 **[price_fetcher.py](backend/price_fetcher.py)**: Fetches historical data, normalizes to percentage returns, exports CSV
 **[correlation_analyzer.py](backend/correlation_analyzer.py)**: Calculates correlations, generates heatmap PNG
-**[main.py](backend/main.py)**: Trains K-Means, classifies clusters, provides hedge recommendations
+**[main.py](backend/main.py)**: Trains K-Means, classifies clusters, provides hedge recommendations, includes caching logic
 
 ### Example Usage
 ```bash
@@ -123,7 +124,7 @@ Python 3.9+, CoinGecko API Key (free tier)
 ### Installation
 ```bash
 cd backend
-pip install pandas scikit-learn requests python-dotenv seaborn matplotlib
+pip install -r requirements.txt
 echo "COIN_GECKO_API_KEY=your_key_here" > .env
 python main.py
 ```
@@ -136,4 +137,4 @@ python main.py
 
 ---
 
-**Status**: ✅ Backend ML Engine Complete → 🚧 Building FastAPI REST Layer
+**Status**: ✅ Backend ML Engine Complete with Caching → 🚧 Building FastAPI REST Layer
