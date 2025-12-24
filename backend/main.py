@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from price_fetcher import generate_df
 from price_fetcher import get_curr_prices
+from portfolio_visualizer import save_portfolio_scatterplot
 
 CLUSTERS = 4
 ANCHOR_SAFE_ASSET = "USDC"
@@ -124,11 +125,11 @@ def get_hedge_rec(coin, clustered_coins):
         print("Insight: You hold a Mid-Cap Altcoin. These often bleed against ETH/BTC.")
         print("Recommendation: Consider rotating into market leaders (Blue Chips) or cash (Safe Haven).")
 
-def analyze_portfolio(portfolio_dict, current_prices, clustered_coins):
+def analyze_portfolio(portfolio_dict, current_prices, clustered_coins, market_df=None):
     cluster_exposure = {}
     total_value = 0.0
     holdings_data = []
-    
+
     # calculate value per cluster
     for coin, quantity in portfolio_dict.items():
         if coin in clustered_coins:
@@ -137,7 +138,7 @@ def analyze_portfolio(portfolio_dict, current_prices, clustered_coins):
 
             price = current_prices.get(coin, 0)
             value = price * quantity
-            
+
             cluster_exposure[cluster_id] = cluster_exposure.get(cluster_id, 0) + value
             total_value += value
 
@@ -276,6 +277,16 @@ def analyze_portfolio(portfolio_dict, current_prices, clustered_coins):
         print("   Insight: Well-structured exposure to Growth, Safety, and Speculation.")
         print("   Action: Maintain current weights.")
 
+    # generate and save visualization
+    if market_df is not None:
+        print("\n--- GENERATING VISUALIZATION ---")
+        user_assets = list(portfolio_dict.keys())
+        try:
+            filepath = save_portfolio_scatterplot(market_df, clustered_coins, user_assets)
+            print(f"✓ Portfolio visualization saved to: {filepath}")
+        except Exception as e:
+            print(f"⚠ Could not generate visualization: {e}")
+
 def main():
     # generates df
     print("Scraping market data...")
@@ -320,7 +331,7 @@ def main():
                 
                 curr_prices = get_curr_prices(portfolio.keys())
 
-                analyze_portfolio(portfolio, curr_prices, clusters)
+                analyze_portfolio(portfolio, curr_prices, clusters, df)
                 break     
 
             case '3':
