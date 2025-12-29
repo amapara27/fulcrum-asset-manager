@@ -4,28 +4,13 @@ from sklearn.decomposition import PCA
 from datetime import datetime
 import os
 
-
+# creates and saves scatterplot visualization
 def save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir="data/visualizations"):
-    """
-    Creates and saves a scatterplot visualization of all assets with user's portfolio highlighted.
-
-    Args:
-        df: DataFrame with market data (Ticker as index)
-        clustered_coins: Series mapping tickers to cluster IDs
-        user_assets: List of ticker symbols that the user holds
-        output_dir: Directory to save the visualization (default: data/visualizations)
-
-    Returns:
-        str: Path to the saved image file
-    """
-    # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
-    # Apply PCA to reduce to 2 dimensions for visualization
     pca = PCA(n_components=2)
     pca_components = pca.fit_transform(df)
 
-    # Create DataFrame with PCA components
     pca_df = pd.DataFrame(
         data=pca_components,
         columns=['PC1', 'PC2']
@@ -33,14 +18,12 @@ def save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir="dat
     pca_df['Ticker'] = df.index
     pca_df['Cluster'] = clustered_coins.values
 
-    # Create figure with larger size for better visibility
     plt.figure(figsize=(14, 10))
 
-    # Define colors for clusters
     colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A']
     cluster_names = [f'Cluster {i}' for i in range(len(colors))]
 
-    # Plot all assets by cluster (background)
+
     for i in range(len(colors)):
         cluster_data = pca_df[pca_df['Cluster'] == i]
         plt.scatter(
@@ -53,11 +36,10 @@ def save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir="dat
             edgecolors='none'
         )
 
-    # Highlight user's assets with distinctive styling
     user_data = pca_df[pca_df['Ticker'].isin(user_assets)]
 
     if not user_data.empty:
-        # Plot user assets with larger markers and borders
+        # plot user assets with larger markers and borders
         for i in range(len(colors)):
             user_cluster_data = user_data[user_data['Cluster'] == i]
             if not user_cluster_data.empty:
@@ -73,7 +55,7 @@ def save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir="dat
                     zorder=5
                 )
 
-        # Add labels for user's assets
+        # add labels for user's assets
         for idx, row in user_data.iterrows():
             plt.annotate(
                 row['Ticker'],
@@ -87,7 +69,7 @@ def save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir="dat
                 zorder=6
             )
 
-    # Add labels for other assets (smaller, more subtle)
+    # add labels for other assets (smaller, more subtle)
     other_data = pca_df[~pca_df['Ticker'].isin(user_assets)]
     for idx, row in other_data.iterrows():
         plt.annotate(
@@ -99,13 +81,12 @@ def save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir="dat
             textcoords='offset points'
         )
 
-    # Add custom legend entry for user assets
+    # add custom legend entry for user assets
     if not user_data.empty:
         plt.scatter([], [], c='gold', s=300, marker='*',
                    edgecolors='black', linewidths=2.5,
                    label='Your Portfolio', alpha=0.9)
 
-    # Labels and title
     variance_ratio = pca.explained_variance_ratio_
     plt.xlabel(f'First Principal Component ({variance_ratio[0]:.1%} variance)', fontsize=13)
     plt.ylabel(f'Second Principal Component ({variance_ratio[1]:.1%} variance)', fontsize=13)
@@ -121,7 +102,6 @@ def save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir="dat
     plt.grid(True, alpha=0.2, linestyle='--')
     plt.tight_layout()
 
-    # Generate filename with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"portfolio_clusters_{timestamp}.png"
     filepath = os.path.join(output_dir, filename)
@@ -134,17 +114,5 @@ def save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir="dat
 
 
 def generate_cluster_report(df, clustered_coins, user_assets, output_dir="data/visualizations"):
-    """
-    Generates a comprehensive visualization and returns the file path.
-
-    Args:
-        df: DataFrame with market data (Ticker as index)
-        clustered_coins: Series mapping tickers to cluster IDs
-        user_assets: List of ticker symbols that the user holds
-        output_dir: Directory to save the visualization
-
-    Returns:
-        str: Path to the saved visualization
-    """
     filepath = save_portfolio_scatterplot(df, clustered_coins, user_assets, output_dir)
     return filepath
